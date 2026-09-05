@@ -1,0 +1,14 @@
+worktree /Users/alice/repo-main
+HEAD abc123def456789abc123def456789abc123def4
+branch refs/heads/main
+worktree /Users/alice/repo-feature-auth
+HEAD def789abc123def456789abc123def456789abc12
+branch refs/heads/feature/auth
+worktree /Users/alice/repo-hotfix
+HEAD 1111111111111111111111111111111111111111
+detached
+prunable gitdir file points to non-existent location
+worktree /Users/alice/repo-old-deleted
+HEAD 2222222222222222222222222222222222222222
+branch refs/heads/deleted-branch
+locked Permission denied

@@ -1,0 +1,40 @@
+{
+  "name": "@gittree/core",
+  "version": "0.1.0",
+  "description": "GitTree core engine - shared logic for managing Git worktrees, branches and sync operations",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js",
+      "require": "./dist/testing/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src/locales"
+  ],
+  "scripts": {
+    "build": "tsup --config ./tsup.config.ts && npm run build:dts",
+    "dev": "tsup --config ./tsup.config.ts --watch",
+    "typecheck": "tsc --noEmit",
+    "build:dts": "tsc -p tsconfig.dts.json"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "eventemitter3": "^5.0.1"
+  },
+  "devDependencies": {
+    "tsup": "^8.2.4"
+  }
+}

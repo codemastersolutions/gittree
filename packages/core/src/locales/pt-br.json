@@ -1,0 +1,28 @@
+{
+  "errors": {
+    "gitVersionTooOld": "Git v{required} é necessário; você tem v{actual}. Atualize o Git antes de usar o GitTree.",
+    "gitExecFailed": "Comando Git '{command}' falhou (exit {exitCode}).\n{stderr}",
+    "dirtyWorktree": "Worktree em '{path}' tem mudanças não commitadas ({count} arquivos). Use --force ou marque a caixa Forçar para descartá-las.",
+    "branchLocked": "Branch '{branch}' já está com checkout em '{path}'. Uma branch só pode estar ativa em uma worktree por vez.",
+    "branchAhead": "Branch '{branch}' está à frente do origin por {count} commits. Faça push primeiro, ou use --skip-push-check para ignorar.",
+    "configParseError": "Falha ao parsear {source}: {detail}"
+  },
+  "worktree": {
+    "addSuccess": "Worktree criada em {path} na branch {branch}",
+    "removeSuccess": "Worktree em {path} removida com sucesso",
+    "pruneFound": "Prune iria remover {count} referências órfãs",
+    "pruneDone": "{count} referências órfãs removidas via prune"
+  },
+  "sync": {
+    "pullFf": "Pull fast-forward de {branch}",
+    "pullMerge": "Pull com merge de {branch}",
+    "pullRebase": "Pull com rebase de {branch}",
+    "conflict": "Não foi possível fast-forward em {branch}; faça merge ou rebase manualmente",
+    "done": "Sincronizadas {count}/{total} worktrees com sucesso"
+  },
+  "common": {
+    "processing": "Processando…",
+    "done": "Concluído",
+    "canceled": "Operação cancelada"
+  }
+}

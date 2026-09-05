@@ -1,0 +1,37 @@
+{
+  "name": "@gittree/cli",
+  "version": "0.1.0",
+  "description": "GitTree CLI - Command-line interface for managing Git worktrees, branches and repository sync",
+  "type": "module",
+  "bin": {
+    "gittree": "./bin/gittree.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "bin",
+    "dist",
+    "src/locales"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --sourcemap --clean",
+    "dev": "tsup src/index.ts --format esm --dts --sourcemap --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@gittree/core": "*",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0",
+    "cosmiconfig": "^9.0.0",
+    "ora": "^8.1.0",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/prompts": "^2.4.9",
+    "tsup": "^8.2.4"
+  }
+}

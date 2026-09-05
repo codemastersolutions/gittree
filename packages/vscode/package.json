@@ -1,0 +1,362 @@
+{
+  "name": "@gittree/vscode",
+  "displayName": "GitTree - Git Worktree Manager",
+  "description": "VS Code extension for managing Git worktrees with graphical sidebar, wizards and safety guards.",
+  "version": "0.1.0",
+  "publisher": "GitTree",
+  "license": "MIT",
+  "private": true,
+  "type": "commonjs",
+  "main": "./dist/extension.js",
+  "categories": [
+    "Other",
+    "SCM Providers"
+  ],
+  "keywords": [
+    "git",
+    "worktree",
+    "worktrees",
+    "branch",
+    "productivity"
+  ],
+  "icon": "resources/icon.png",
+  "galleryBanner": {
+    "color": "#1f6feb",
+    "theme": "dark"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "activationEvents": [
+    "onStartupFinished",
+    "onView:gittree"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gittree",
+          "title": "GitTree",
+          "icon": "resources/activity-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "gittree": [
+        {
+          "id": "gittree.worktrees",
+          "name": "Worktrees",
+          "type": "tree"
+        },
+        {
+          "id": "gittree.status",
+          "name": "Repository Status",
+          "type": "tree",
+          "when": "gittree:repoDetected"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "gittree.refresh",
+        "title": "GitTree: Refresh Worktrees",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "gittree.newWorktree",
+        "title": "GitTree: New Worktree...",
+        "icon": "$(add)"
+      },
+      {
+        "command": "gittree.openFolder",
+        "title": "GitTree: Open Worktree in New Window",
+        "icon": "$(multiple-windows)"
+      },
+      {
+        "command": "gittree.revealFile",
+        "title": "GitTree: Reveal in Explorer/Finder",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "gittree.openTerminal",
+        "title": "GitTree: Open Terminal Here",
+        "icon": "$(terminal)"
+      },
+      {
+        "command": "gittree.pullWorktree",
+        "title": "GitTree: Pull Worktree (ff-only)",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "gittree.pushWorktree",
+        "title": "GitTree: Push Worktree",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "gittree.syncAll",
+        "title": "GitTree: Sync All Worktrees",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "gittree.removeWorktree",
+        "title": "GitTree: Remove Worktree...",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "gittree.prune",
+        "title": "GitTree: Prune Worktree Refs...",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "gittree.repoStatus",
+        "title": "GitTree: Show Repository Health",
+        "icon": "$(heart)"
+      },
+      {
+        "command": "gittree.worktreeDetails",
+        "title": "GitTree: Show Worktree Details",
+        "icon": "$(info)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "gittree.refresh",
+          "when": "view == gittree.worktrees",
+          "group": "navigation@1"
+        },
+        {
+          "command": "gittree.newWorktree",
+          "when": "view == gittree.worktrees",
+          "group": "navigation@2"
+        },
+        {
+          "command": "gittree.syncAll",
+          "when": "view == gittree.worktrees",
+          "group": "navigation@3"
+        },
+        {
+          "command": "gittree.prune",
+          "when": "view == gittree.worktrees",
+          "group": "navigation@4"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "gittree.openFolder",
+          "when": "view == gittree.worktrees && viewItem =~ /worktree/",
+          "group": "navigation@1"
+        },
+        {
+          "command": "gittree.revealFile",
+          "when": "view == gittree.worktrees && viewItem =~ /worktree/",
+          "group": "navigation@2"
+        },
+        {
+          "command": "gittree.openTerminal",
+          "when": "view == gittree.worktrees && viewItem =~ /worktree/",
+          "group": "navigation@3"
+        },
+        {
+          "command": "gittree.pullWorktree",
+          "when": "view == gittree.worktrees && viewItem =~ /worktree/",
+          "group": "inline@1"
+        },
+        {
+          "command": "gittree.pushWorktree",
+          "when": "view == gittree.worktrees && viewItem =~ /worktree/",
+          "group": "inline@2"
+        },
+        {
+          "command": "gittree.removeWorktree",
+          "when": "view == gittree.worktrees && viewItem =~ /worktree/",
+          "group": "inline@3"
+        },
+        {
+          "command": "gittree.worktreeDetails",
+          "when": "view == gittree.worktrees && viewItem =~ /worktree/",
+          "group": "navigation@4"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "gittree.refresh",
+          "when": "gittree:repoDetected"
+        },
+        {
+          "command": "gittree.newWorktree",
+          "when": "gittree:repoDetected"
+        },
+        {
+          "command": "gittree.syncAll",
+          "when": "gittree:repoDetected"
+        },
+        {
+          "command": "gittree.repoStatus",
+          "when": "gittree:repoDetected"
+        },
+        {
+          "command": "gittree.openFolder",
+          "when": "false"
+        },
+        {
+          "command": "gittree.revealFile",
+          "when": "false"
+        },
+        {
+          "command": "gittree.openTerminal",
+          "when": "false"
+        },
+        {
+          "command": "gittree.pullWorktree",
+          "when": "false"
+        },
+        {
+          "command": "gittree.pushWorktree",
+          "when": "false"
+        },
+        {
+          "command": "gittree.removeWorktree",
+          "when": "false"
+        },
+        {
+          "command": "gittree.prune",
+          "when": "false"
+        },
+        {
+          "command": "gittree.worktreeDetails",
+          "when": "false"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "gittree.refresh",
+        "key": "ctrl+alt+g r",
+        "mac": "cmd+alt+g r",
+        "when": "gittree:repoDetected"
+      },
+      {
+        "command": "gittree.newWorktree",
+        "key": "ctrl+alt+g n",
+        "mac": "cmd+alt+g n",
+        "when": "gittree:repoDetected"
+      },
+      {
+        "command": "gittree.openFolder",
+        "key": "ctrl+alt+g o",
+        "mac": "cmd+alt+g o",
+        "when": "gittree:repoDetected"
+      },
+      {
+        "command": "gittree.openTerminal",
+        "key": "ctrl+alt+g t",
+        "mac": "cmd+alt+g t",
+        "when": "gittree:repoDetected"
+      },
+      {
+        "command": "gittree.pullWorktree",
+        "key": "ctrl+alt+g p",
+        "mac": "cmd+alt+g p",
+        "when": "gittree:repoDetected"
+      },
+      {
+        "command": "gittree.pushWorktree",
+        "key": "ctrl+alt+g u",
+        "mac": "cmd+alt+g u",
+        "when": "gittree:repoDetected"
+      },
+      {
+        "command": "gittree.syncAll",
+        "key": "ctrl+alt+g s",
+        "mac": "cmd+alt+g s",
+        "when": "gittree:repoDetected"
+      },
+      {
+        "command": "gittree.removeWorktree",
+        "key": "ctrl+alt+g x",
+        "mac": "cmd+alt+g x",
+        "when": "gittree:repoDetected"
+      },
+      {
+        "command": "gittree.repoStatus",
+        "key": "ctrl+alt+g h",
+        "mac": "cmd+alt+g h",
+        "when": "gittree:repoDetected"
+      }
+    ],
+    "configuration": {
+      "title": "GitTree",
+      "properties": {
+        "gittree.defaultWorktreeBaseDir": {
+          "type": "string",
+          "default": "..",
+          "description": "Base directory where new worktrees are created by default (relative to the main repository)."
+        },
+        "gittree.defaultSyncStrategy": {
+          "type": "string",
+          "enum": [
+            "ff-only",
+            "merge",
+            "rebase"
+          ],
+          "default": "ff-only",
+          "description": "Default synchronization strategy used when pulling worktrees."
+        },
+        "gittree.autoCopyDotEnv": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically copy .env file when creating a new worktree (if not configured in .gittree.json)."
+        },
+        "gittree.confirmRemoval": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ask for explicit confirmation before removing a worktree."
+        },
+        "gittree.defaultShell": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "description": "Default shell path used when opening a terminal in a worktree. Leave null to use VS Code default."
+        },
+        "gittree.telemetry.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable anonymous telemetry (disabled by default)."
+        },
+        "gittree.language": {
+          "type": "string",
+          "enum": [
+            "default",
+            "en",
+            "pt-br",
+            "es"
+          ],
+          "default": "default",
+          "description": "UI language. 'default' follows VS Code language setting."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "dev": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "package": "vsce package --out ../../dist/gittree-vscode.vsix",
+    "test": "node ./out/test/runTest.js"
+  },
+  "dependencies": {
+    "@gittree/core": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "@types/vscode": "^1.80.0",
+    "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^3.1.0",
+    "esbuild": "^0.28.2",
+    "tsup": "^8.2.4",
+    "typescript": "^5.6.2"
+  }
+}

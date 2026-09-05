@@ -1,0 +1,10 @@
+# branch.oid 1111111111111111111111111111111111111111
+# branch.head feature/auth
+# branch.upstream origin/feature/auth
+# ahead 2
+# behind 1
+1 .M N... 100644 100644 100644 abc abc src/auth/login.ts
+1 .A N... 000000 100644 100644 0000000000000000000000000000000000000000 def src/auth/signup.ts
+1 .D N... 100644 000000 000000 ghi ghi src/auth/legacy.ts
+? src/auth/.env.local
+? uploads/tmp.bin

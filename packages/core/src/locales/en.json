@@ -1,0 +1,28 @@
+{
+  "errors": {
+    "gitVersionTooOld": "Git v{required} is required; you have v{actual}. Upgrade Git before using GitTree.",
+    "gitExecFailed": "Git command '{command}' failed (exit {exitCode}).\n{stderr}",
+    "dirtyWorktree": "Worktree at '{path}' has uncommitted changes ({count} files). Pass --force or check the Force checkbox to discard them.",
+    "branchLocked": "Branch '{branch}' is already checked out at '{path}'. A branch can only be active in one worktree at a time.",
+    "branchAhead": "Branch '{branch}' is ahead of origin by {count} commits. Push first, or pass --skip-push-check to bypass.",
+    "configParseError": "Failed to parse {source}: {detail}"
+  },
+  "worktree": {
+    "addSuccess": "Worktree created at {path} on branch {branch}",
+    "removeSuccess": "Worktree at {path} removed successfully",
+    "pruneFound": "Prune would remove {count} stale references",
+    "pruneDone": "Pruned {count} stale worktree references"
+  },
+  "sync": {
+    "pullFf": "Fast-forward pull of {branch}",
+    "pullMerge": "Merge pull of {branch}",
+    "pullRebase": "Rebase pull of {branch}",
+    "conflict": "Cannot fast-forward {branch}; merge or rebase manually",
+    "done": "Synchronized {count}/{total} worktrees successfully"
+  },
+  "common": {
+    "processing": "Processing…",
+    "done": "Done",
+    "canceled": "Operation canceled"
+  }
+}
