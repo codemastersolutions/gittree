@@ -1,0 +1,331 @@
+name: Release (CLI + Core → npm)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump override (skip conventional-commits auto-detect)"
+        required: false
+        default: ""
+        type: choice
+        options:
+          - ""
+          - major
+          - minor
+          - patch
+          - prerelease
+      tag-prefix:
+        description: "Prefixo da tag (padrão: v)"
+        required: false
+        default: "v"
+        type: string
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "20.x"
+  PNPM_VERSION: "12"
+  # commit-and-tag-version defaults (sobreponha via workflow_dispatch se necessário)
+  DEFAULT_TAG_PREFIX: "v"
+
+jobs:
+  # ============================================================
+  # GUARD: Garante que SOMENTE executa o release se os checks
+  # do último commit (HEAD de main) PASSARAM. O Branch
+  # Protection Rule deveria bloquear PRs merges sem isto, mas
+  # esta etapa serve como camada adicional de segurança:
+  # caso alguém force-push ou bypass o protection, aqui o
+  # workflow aborta ANTES de publicar qualquer coisa no npm.
+  # ============================================================
+  preflight-required-checks:
+    name: Guard · Required Checks (last commit HEAD of main)
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      statuses: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Wait & verify CI check-suites passed on HEAD commit
+        id: checks
+        uses: poseidon/wait-for-status-checks@v0.5.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Match EXACTAMENTE os nomes dos jobs do ci.yml que são
+          # required checks na branch protection rule.
+          # Se você adicionar/renomear jobs no ci.yml, atualize
+          # esta lista e a Branch Protection em paralelo.
+          ignore: |
+            Release (CLI + Core → npm)
+            pages-build-deployment
+          # Espera máx. 15 minutos (se CI ainda estiver rodando
+          # após merge de um PR). O default já é generoso.
+          timeout-seconds: 900
+          expected-conclusions: success,neutral,skipped
+
+      - name: Summary guard
+        run: |
+          echo "✅ Todos os required checks do commit $(git rev-parse --short HEAD) na branch main PASSARAM."
+          echo "Release workflow autorizado a prosseguir."
+
+  # ============================================================
+  # RELEASE PRINCIPAL
+  # - Detecta versionamento via conventional-commits
+  # - Bumpa versão em ROOT + CLI + CORE (mantém sincronia)
+  # - Atualiza CHANGELOG.md
+  # - Cria e pusha commit de release + tag anotada
+  # - Publica @codemastersolutions/gittree-core primeiro
+  # - Publica @codemastersolutions/gittree-cli DEPOIS (CLI
+  #   depende do core em dev via workspace:*)
+  # ============================================================
+  release-publish:
+    name: Release · Bump + Tag + Publish (npm Provenance SLSA L3)
+    needs: [preflight-required-checks]
+    runs-on: ubuntu-latest
+    # ======================================================
+    # 🔑 PERMISSÕES OBRIGATÓRIAS PARA NPM PROVENANCE + TAG
+    # 🔑 id-token: write  → OIDC token (npm Trusted Publisher)
+    # 🔑 contents: write → git push tag + commit do release
+    # 🔑 attestations: write → (novo GitHub) SLSA attestation
+    # ======================================================
+    permissions:
+      id-token: write
+      contents: write
+      attestations: write
+      packages: write
+    environment:
+      name: npm-publish
+      url: https://www.npmjs.com/package/@codemastersolutions/gittree-cli
+
+    steps:
+      - name: Checkout repository (full history para conventional commits)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }} + pnpm via corepack
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Enable corepack & prepare pnpm
+        shell: bash
+        run: |
+          corepack enable
+          corepack prepare pnpm@${{ env.PNPM_VERSION }}.x --activate
+          pnpm --version
+
+      - name: Install dependencies (frozen lockfile)
+        shell: bash
+        run: |
+          pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Configure release bot (git user)
+        shell: bash
+        run: |
+          git config user.name  "GitTree Release Bot"
+          git config user.email "release-bot@codemastersolutions.com.br"
+
+      - name: (Workflow Dispatch) Detect bump override
+        id: bump
+        shell: bash
+        run: |
+          if [[ -n "${{ github.event.inputs.bump }}" ]]; then
+            echo "override=${{ github.event.inputs.bump }}" >> $GITHUB_OUTPUT
+            echo "manual=1" >> $GITHUB_OUTPUT
+            echo "Overriding semver detection -> ${{ github.event.inputs.bump }}"
+          else
+            echo "override=" >> $GITHUB_OUTPUT
+            echo "manual=0" >> $GITHUB_OUTPUT
+            echo "Auto semver via conventional-commits."
+          fi
+
+      - name: 1/8 · Dry-run detect next version
+        id: next-version
+        shell: bash
+        env:
+          BUMP_OVERRIDE: ${{ steps.bump.outputs.override }}
+          TAG_PREFIX: ${{ github.event.inputs.tag-prefix || env.DEFAULT_TAG_PREFIX }}
+        run: |
+          # Instala commit-and-tag-version (mantém distro limpa: sem devDep permanente)
+          pnpm dlx commit-and-tag-version@12 \
+            --dry-run \
+            --tag-prefix "$TAG_PREFIX" \
+            ${BUMP_OVERRIDE:+--release-as "$BUMP_OVERRIDE"} \
+            --skip.commit --skip.tag --skip.changelog \
+            > /tmp/cttv-dryrun.log 2>&1 || cat /tmp/cttv-dryrun.log
+
+          NEXT=$(awk '/^tagging release/ {gsub("'"$TAG_PREFIX"'",""); print $NF}' /tmp/cttv-dryrun.log | head -n1)
+          if [[ -z "$NEXT" ]]; then
+            NEXT=$(node -e "console.log(require('./package.json').version)")
+            echo "⚠️  Sem alterações release-worthy detectadas; mantendo versão atual: $NEXT"
+            echo "skip=1" >> $GITHUB_OUTPUT
+          else
+            echo "skip=0" >> $GITHUB_OUTPUT
+          fi
+          echo "version=$NEXT" >> $GITHUB_OUTPUT
+          echo "tag=${TAG_PREFIX}${NEXT}" >> $GITHUB_OUTPUT
+          cat /tmp/cttv-dryrun.log
+
+      - name: 2/8 · Increment version + changelog (conventional-commits)
+        if: steps.next-version.outputs.skip == 0
+        shell: bash
+        env:
+          BUMP_OVERRIDE: ${{ steps.bump.outputs.override }}
+          TAG_PREFIX: ${{ github.event.inputs.tag-prefix || env.DEFAULT_TAG_PREFIX }}
+        run: |
+          # Executa na RAIZ: vai atualizar ROOT package.json version,
+          # gera CHANGELOG.md, cria commit e cria TAG anotada.
+          pnpm dlx commit-and-tag-version@12 \
+            --tag-prefix "$TAG_PREFIX" \
+            ${BUMP_OVERRIDE:+--release-as "$BUMP_OVERRIDE"} \
+            --commitAll \
+            -a
+
+          # 🔁 Sincroniza a NOVA versão do ROOT para CLI e CORE.
+          # (commit-and-tag-version atualizou SÓ o root; precisamos
+          #  de todas as 3 package.jsons sincronizadas antes do push.)
+          NEW_VERSION=$(node -e "console.log(require('./package.json').version)")
+          echo "Sincronizando ROOT version=$NEW_VERSION → CLI, CORE, VSCODE..."
+
+          for p in packages/cli packages/core packages/vscode; do
+            node -e "
+              const fs = require('fs');
+              const pkg = JSON.parse(fs.readFileSync('$p/package.json','utf8'));
+              pkg.version = '$NEW_VERSION';
+              fs.writeFileSync('$p/package.json', JSON.stringify(pkg, null, 2) + '\n');
+            "
+          done
+
+          # Adiciona a sincronia ao commit release recém-criado
+          git add packages/*/package.json
+          git commit --amend --no-edit
+
+          TAG="${TAG_PREFIX}${NEW_VERSION}"
+          # Recria a tag para apontar para o commit amendado
+          git tag -f "$TAG"
+          echo "Nova release: $TAG"
+
+      - name: 3/8 · Push release commit + tag para origin/main
+        if: steps.next-version.outputs.skip == 0
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Pega a versão SINCERONIZADA (pós-amend)
+          NEW_VERSION=$(node -e "console.log(require('./package.json').version)")
+          TAG="${{ github.event.inputs.tag-prefix || env.DEFAULT_TAG_PREFIX }}${NEW_VERSION}"
+
+          git push origin main
+          git push origin "$TAG"
+
+          # Expoe versões pros próximos steps
+          echo "VERSION=$NEW_VERSION"        >> $GITHUB_ENV
+          echo "RELEASE_TAG=$TAG"            >> $GITHUB_ENV
+
+          echo "## 🚀 Release \`$TAG\` created" >> $GITHUB_STEP_SUMMARY
+
+      - name: 4/8 · Build CLI + Core (zero runtime deps: bundlers inlined)
+        if: steps.next-version.outputs.skip == 0
+        shell: bash
+        run: |
+          pnpm --filter @codemastersolutions/gittree-core run build
+          pnpm --filter @codemastersolutions/gittree-cli  run build
+          pnpm typecheck
+          pnpm lint
+
+      - name: 5/8 · Run full unit-tests + 90% coverage gate
+        if: steps.next-version.outputs.skip == 0
+        shell: bash
+        run: |
+          pnpm test:coverage
+
+      - name: 6/8 · Publish @codemastersolutions/gittree-core [npm · provenance]
+        if: steps.next-version.outputs.skip == 0
+        shell: bash
+        working-directory: packages/core
+        # ────────────────────────────────────────────────────────
+        # 🛡️ TRUSTED PUBLISHER + PROVENANCE (npm · SLSA Level 3)
+        #    - Não usamos NPM_TOKEN secret clássico.
+        #    - pnpm publish --provenance envia um JWT do GitHub
+        #      Actions OIDC diretamente para o registry npmjs.
+        #    - npm exige repository.directory EXATO no package.json
+        #      (já configurado acima em `packages/core/package.json`)
+        # ────────────────────────────────────────────────────────
+        env:
+          # Required para npm --provenance (v9+) resolver corretamente o repo:
+          NPM_CONFIG_PROVENANCE: "true"
+        run: |
+          # No-op fallback se publicação já aconteceu em re-runs
+          PKG="@codemastersolutions/gittree-core"
+          VERSION="$VERSION"
+          if npm view "$PKG@$VERSION" version 2>/dev/null | grep -qF "$VERSION"; then
+            echo "🟡 $PKG@$VERSION já publicado no npm; skip."
+          else
+            pnpm publish \
+              --access public \
+              --provenance \
+              --no-git-checks \
+              --tag latest \
+              --report-summary
+            echo "✅ $PKG@$VERSION publicado (provenance ativo)."
+          fi
+
+      - name: 7/8 · Publish @codemastersolutions/gittree-cli [npm · provenance]
+        if: steps.next-version.outputs.skip == 0
+        shell: bash
+        working-directory: packages/cli
+        env:
+          NPM_CONFIG_PROVENANCE: "true"
+        run: |
+          PKG="@codemastersolutions/gittree-cli"
+          VERSION="$VERSION"
+          if npm view "$PKG@$VERSION" version 2>/dev/null | grep -qF "$VERSION"; then
+            echo "🟡 $PKG@$VERSION já publicado no npm; skip."
+          else
+            # Atraso intencional 15s para o registry propagar o
+            # core recém-publicado (evita race de dependências em
+            # usuários que instalam a CLI imediatamente).
+            sleep 15
+            pnpm publish \
+              --access public \
+              --provenance \
+              --no-git-checks \
+              --tag latest \
+              --report-summary
+            echo "✅ $PKG@$VERSION publicado (provenance ativo)."
+          fi
+
+      - name: 8/8 · GitHub Release (automática · com changelog do release)
+        if: steps.next-version.outputs.skip == 0
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          generate_release_notes: true
+          name: Release ${{ env.RELEASE_TAG }}
+          fail_on_unmatched_files: false
+          # Anexa CHANGELOG.md gerado + CLI tarball (opcional)
+          files: |
+            CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Skip (sem alterações release-worthy)
+        if: steps.next-version.outputs.skip == 1
+        shell: bash
+        run: |
+          echo "Nenhuma alteração release-worthy desde a última tag;"
+          echo "nada para publicar. Release abortado com sucesso."
+          echo "## 🟡 Skip · nada para publicar" >> $GITHUB_STEP_SUMMARY

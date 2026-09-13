@@ -1,0 +1,7 @@
+packages:
+  - 'packages/*'
+allowBuilds:
+  '@codemastersolutions/commitzero': true
+  '@vscode/vsce-sign': true
+  esbuild: true
+  keytar: true

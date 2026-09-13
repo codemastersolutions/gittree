@@ -1,0 +1,26 @@
+{
+  "types": [
+    "feat",
+    "fix",
+    "docs",
+    "style",
+    "refactor",
+    "perf",
+    "test",
+    "build",
+    "ci",
+    "chore",
+    "revert"
+  ],
+  "scopes": ["core", "cli", "vscode", "repo", "ci", "deps", "readme", "docs", "test"],
+  "requireScope": false,
+  "maxSubjectLength": 72,
+  "allowBreaking": true,
+  "footerKeywords": ["BREAKING CHANGE", "Closes", "Refs"],
+  "preCommitCommands": ["pnpm run lint:staged"],
+  "preCommitTimeout": "3m",
+  "language": "pt",
+  "uiAltScreen": true,
+  "versionCheckEnabled": true,
+  "versionCheckPeriod": "weekly"
+}

@@ -1,8 +1,37 @@
 {
-  "name": "@gittree/core",
+  "name": "@codemastersolutions/gittree-core",
   "version": "0.1.0",
   "description": "GitTree core engine - shared logic for managing Git worktrees, branches and sync operations",
+  "license": "MIT",
   "type": "module",
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codemastersolutions/gittree.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/codemastersolutions/gittree/issues"
+  },
+  "homepage": "https://github.com/codemastersolutions/gittree/tree/develop/packages/core#readme",
+  "author": "CodeMaster Solutionções <gilson@codemastersolutions.com>",
+  "keywords": [
+    "git",
+    "worktree",
+    "git-worktree",
+    "core",
+    "library",
+    "branch",
+    "sync",
+    "developer-tools",
+    "gittree"
+  ],
+  "sideEffects": false,
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -19,11 +48,14 @@
     }
   },
   "files": [
-    "dist",
-    "src/locales"
+    "LICENSE",
+    "README.md",
+    "README.pt-br.md",
+    "README.es.md",
+    "dist"
   ],
   "scripts": {
-    "build": "tsup --config ./tsup.config.ts && npm run build:dts",
+    "build": "tsup --config ./tsup.config.ts && pnpm run build:dts",
     "dev": "tsup --config ./tsup.config.ts --watch",
     "typecheck": "tsc --noEmit",
     "build:dts": "tsc -p tsconfig.dts.json"
@@ -31,9 +63,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "dependencies": {
-    "eventemitter3": "^5.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "tsup": "^8.2.4"
   }

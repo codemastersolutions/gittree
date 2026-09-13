@@ -7,6 +7,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+# Never commit npm lock files (project uses pnpm exclusively)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml.bak
 .env
 .env.local
 .env.*.local
@@ -17,8 +21,12 @@ yarn-error.log*
 .tmp/
 tmp/
 .husky/_/
+.husky/
 .npm
 .eslintcache
 .vscode/settings.json
 .vscode/launch.json
 !.vscode/extensions.json
+commitzero.config.custom.json
+commitzero.config.custom.js
+

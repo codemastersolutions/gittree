@@ -1,36 +1,73 @@
 {
-  "name": "@gittree/cli",
+  "name": "@codemastersolutions/gittree-cli",
   "version": "0.1.0",
   "description": "GitTree CLI - Command-line interface for managing Git worktrees, branches and repository sync",
+  "license": "MIT",
   "type": "module",
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codemastersolutions/gittree.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/codemastersolutions/gittree/issues"
+  },
+  "homepage": "https://github.com/codemastersolutions/gittree/tree/develop/packages/cli#readme",
+  "author": "CodeMaster Solutionções <gilson@codemastersolutions.com>",
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/codemastersolutions"
+    }
+  ],
+  "keywords": [
+    "git",
+    "worktree",
+    "git-worktree",
+    "cli",
+    "branch",
+    "productivity",
+    "monorepo",
+    "sync",
+    "developer-tools",
+    "gittree"
+  ],
   "bin": {
     "gittree": "./bin/gittree.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "files": [
+    "LICENSE",
+    "README.md",
+    "README.pt-br.md",
+    "README.es.md",
     "bin",
-    "dist",
-    "src/locales"
+    "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --sourcemap --clean",
-    "dev": "tsup src/index.ts --format esm --dts --sourcemap --watch",
+    "build": "tsup --config ./tsup.config.ts && pnpm run build:dts",
+    "build:dts": "tsc -p tsconfig.dts.json",
+    "dev": "tsup --config ./tsup.config.ts --watch",
     "typecheck": "tsc --noEmit"
   },
   "engines": {
     "node": ">=18.0.0"
   },
-  "dependencies": {
-    "@gittree/core": "*",
-    "chalk": "^5.3.0",
-    "cli-table3": "^0.6.5",
-    "commander": "^12.1.0",
-    "cosmiconfig": "^9.0.0",
-    "ora": "^8.1.0",
-    "prompts": "^2.4.2"
-  },
   "devDependencies": {
+    "@codemastersolutions/gittree-core": "workspace:*",
     "@types/prompts": "^2.4.9",
     "tsup": "^8.2.4"
   }

@@ -37,8 +37,7 @@ export function parseWorktreePorcelain(
         continue;
       }
       if (line.startsWith('branch ')) {
-        const ref = line.slice('branch '.length);
-        branch = ref.replace(/^refs\/heads\//, '');
+        branch = line.slice('branch '.length);
         continue;
       }
       if (line === 'detached') {

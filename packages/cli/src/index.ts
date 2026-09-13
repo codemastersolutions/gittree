@@ -1,1 +1,3 @@
-export const GITTREE_CLI_VERSION = '0.1.0';
+export { run, GITTREE_CLI_VERSION } from './cli.js';
+
+export type { CliRunOptions } from './cli.js';

@@ -59,7 +59,7 @@ export class MockGitAdapter implements GitAdapter {
         : commandPredicate instanceof RegExp
           ? (_c: string) => commandPredicate.test(_c)
           : commandPredicate;
-    this.queue.unshift({
+    this.queue.push({
       predicate,
       output: { stdout, stderr, exitCode },
     });

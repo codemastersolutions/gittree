@@ -1,28 +1,30 @@
 {
   "errors": {
-    "gitVersionTooOld": "Git v{required} is required; you have v{actual}. Upgrade Git before using GitTree.",
-    "gitExecFailed": "Git command '{command}' failed (exit {exitCode}).\n{stderr}",
-    "dirtyWorktree": "Worktree at '{path}' has uncommitted changes ({count} files). Pass --force or check the Force checkbox to discard them.",
-    "branchLocked": "Branch '{branch}' is already checked out at '{path}'. A branch can only be active in one worktree at a time.",
-    "branchAhead": "Branch '{branch}' is ahead of origin by {count} commits. Push first, or pass --skip-push-check to bypass.",
-    "configParseError": "Failed to parse {source}: {detail}"
-  },
-  "worktree": {
-    "addSuccess": "Worktree created at {path} on branch {branch}",
-    "removeSuccess": "Worktree at {path} removed successfully",
-    "pruneFound": "Prune would remove {count} stale references",
-    "pruneDone": "Pruned {count} stale worktree references"
+    "gitVersionTooOld": "Git {required} is required; found {actual}",
+    "gitExecutionFailed": "Git command failed: {command}",
+    "dirtyWorktree": "Worktree at {path} has {count} uncommitted changes; use --force to override",
+    "branchLocked": "Branch '{branch}' is already checked out at '{path}'",
+    "branchAhead": "Branch '{branch}' is {ahead} commits ahead of its upstream",
+    "configParseError": "Failed to parse {source}: {message}",
+    "worktreePathExists": "Path '{path}' already exists; choose another destination or remove the folder first",
+    "worktreeAddFailed": "Could not create worktree: {stderr}",
+    "worktreeAddMissingResult": "Worktree creation succeeded but no entry found at '{path}'; run `git worktree list` to inspect",
+    "worktreeNotFound": "No worktree found at '{path}'",
+    "worktreeRemoveFailed": "Could not remove worktree: {stderr}",
+    "worktreePruneFailed": "Could not prune worktrees: {stderr}",
+    "branchDeleteFailed": "Could not delete local branch '{branch}': {stderr}",
+    "remoteBranchDeleteFailed": "Could not delete remote branch '{remote}/{branch}': {stderr}",
+    "branchAheadBeforeRemove": "Branch '{branch}' is {ahead} commits ahead; push first or use --skip-push-check or --force"
   },
   "sync": {
-    "pullFf": "Fast-forward pull of {branch}",
-    "pullMerge": "Merge pull of {branch}",
-    "pullRebase": "Rebase pull of {branch}",
-    "conflict": "Cannot fast-forward {branch}; merge or rebase manually",
-    "done": "Synchronized {count}/{total} worktrees successfully"
+    "conflict": "Merge conflict detected while syncing with '{ref}' (strategy {strategy}); resolve conflicts manually"
   },
   "common": {
     "processing": "Processing…",
     "done": "Done",
     "canceled": "Operation canceled"
+  },
+  "cli": {
+    "commandNotImplemented": "Command '{command}' is not implemented yet. Follow progress at {url}"
   }
 }

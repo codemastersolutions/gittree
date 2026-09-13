@@ -36,6 +36,11 @@ export default defineConfig({
     alias: {
       '@gittree/core': path.resolve(__dirname, 'packages/core/src/index.ts'),
       '@gittree/core/testing': path.resolve(__dirname, 'packages/core/src/testing/index.ts'),
+      '@codemastersolutions/gittree-core': path.resolve(__dirname, 'packages/core/src/index.ts'),
+      '@codemastersolutions/gittree-core/testing': path.resolve(
+        __dirname,
+        'packages/core/src/testing/index.ts',
+      ),
     },
   },
 });

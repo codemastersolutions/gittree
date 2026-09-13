@@ -74,6 +74,6 @@ describe('WorktreeService', () => {
     adapter.queueOutput('worktree list --porcelain', WORKTREE_LIST_4);
     const m = await service.detectMainWorktree();
     expect(m?.path).toBe('/Users/alice/repo-main');
-    expect(m?.branch).toBe('main');
+    expect(m?.branch).toBe('refs/heads/main');
   });
 });

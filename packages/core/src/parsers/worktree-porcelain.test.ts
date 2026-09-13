@@ -11,12 +11,12 @@ describe('parseWorktreePorcelain', () => {
     const [main, auth, hotfix, old] = wts as [unknown, unknown, unknown, unknown];
 
     expect((main as { path: string }).path).toBe('/Users/alice/repo-main');
-    expect((main as { branch: string | undefined }).branch).toBe('main');
+    expect((main as { branch: string | undefined }).branch).toBe('refs/heads/main');
     expect((main as { isMain: boolean }).isMain).toBe(true);
     expect((main as { isDetached: boolean }).isDetached).toBe(false);
 
     expect((auth as { path: string }).path).toBe('/Users/alice/repo-feature-auth');
-    expect((auth as { branch: string | undefined }).branch).toBe('feature/auth');
+    expect((auth as { branch: string | undefined }).branch).toBe('refs/heads/feature/auth');
     expect((auth as { isMain: boolean }).isMain).toBe(false);
 
     expect((hotfix as { isDetached: boolean }).isDetached).toBe(true);

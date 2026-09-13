@@ -19,7 +19,8 @@ import {
   type GitTree,
   type Worktree,
   type WorktreeState,
-  type SyncStrategy
+  type SyncStrategy,
+  type CommitLogEntry,
 } from '@gittree/core';
 
 // Utilidades de test (entrada separada, excluida de bundles de producción)
@@ -34,7 +35,7 @@ import { RealGitAdapter, createGitTree } from '@gittree/core';
 const core = createGitTree({
   cwd: process.cwd(),
   adapter: new RealGitAdapter({ cwd: process.cwd() }),
-  locale: 'es' // o 'en' | 'pt-br'
+  locale: 'es', // o 'en' | 'pt-br'
 });
 
 const worktrees = await core.worktree.list();
@@ -48,6 +49,19 @@ const trees = await core.worktree.list();
 for (const wt of trees) {
   const state = await core.worktree.getStatus(wt.path);
   console.log(`${wt.branch ?? wt.head} => dirty=${state.dirty}`);
+}
+
+// Obtiene commits recientes acotados a una worktree (usa `git log -- <ruta>`)
+const trees = await core.worktree.list();
+const feature = trees.find((wt) => wt.branch === 'feat/x');
+if (feature) {
+  const commits: CommitLogEntry[] = await core.repo.logRecent({
+    path: feature.path,
+    limit: 10,
+  });
+  for (const c of commits) {
+    console.log(`[${c.hashShort}] ${c.author} — ${c.subject} (${c.dateIso})`);
+  }
 }
 
 // Mock en tests — sin Git real requerido
@@ -74,13 +88,17 @@ expect(mock.calls()).toContainEqual({ command: 'git worktree list --porcelain' }
 - **Testabilidad primero**: usa `@gittree/core/testing` + archivos fixture en
   `packages/core/src/__fixtures__/` para el 100% de los tests unitarios. Git real solo se
   ejecuta en las suites de integración.
+- **Parser de commit log**: `repo.logRecent()` ejecuta `git log -n <limite> --pretty=format:%h|%H|%an|%ai|%s
+-- <ruta>` y parsea la salida separada por pipes en `CommitLogEntry` con 5 campos:
+  `hashShort` (%h), `hash` (%H), `author` (%an), `dateIso` (%ai) y `subject` (%s). Si omites
+  `path` devuelve commits de todo el repositorio; `limit` tiene valor por defecto `10`.
 
 ---
 
 ## Scripts del Paquete
 
-| Script | Descripción |
-|---|---|
-| `npm -w @gittree/core run build` | Build dual ESM + CJS con `tsup` |
-| `npm -w @gittree/core run dev` | Build en modo watch |
-| `npm -w @gittree/core run typecheck` | `tsc --noEmit` strict |
+| Script                               | Descripción                     |
+| ------------------------------------ | ------------------------------- |
+| `npm -w @gittree/core run build`     | Build dual ESM + CJS con `tsup` |
+| `npm -w @gittree/core run dev`       | Build en modo watch             |
+| `npm -w @gittree/core run typecheck` | `tsc --noEmit` strict           |

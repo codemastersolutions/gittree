@@ -16,7 +16,7 @@ describe('I18n', () => {
     });
     expect(msg).toContain('/tmp/x');
     expect(msg).toContain('3');
-    expect(msg).toContain('mudanças não commitadas');
+    expect(msg).toContain('alterações não commitadas');
   });
 
   it('falls back through the chain when key is missing in primary locale', () => {

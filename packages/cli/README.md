@@ -17,6 +17,20 @@ npm install -g @gittree/cli
 gittree --version
 ```
 
+#### Enable Shell Completion (optional)
+
+```bash
+# bash → append this line to ~/.bashrc or ~/.bash_profile
+source <(gittree completion bash)
+
+# zsh → save to any directory in your $fpath (recommended)
+gittree completion zsh > /usr/local/share/zsh/site-functions/_gittree
+# then: autoload -Uz compinit && compinit
+
+# fish → save to the standard fish completions directory
+gittree completion fish > ~/.config/fish/completions/gittree.fish
+```
+
 ### Global Options
 
 ```
@@ -49,8 +63,15 @@ gittree worktree sync --all --strategy ff-only
 # Health check of the whole repository
 gittree repo doctor
 
-# Generate autocomplete script for your shell
-gittree config completion zsh > /usr/local/share/zsh/site-functions/_gittree
+# Global config: list, get, set, unset keys across repos
+gittree config list
+gittree config get defaultWorktreeBaseDir
+gittree config set defaultWorktreeBaseDir ~/git-worktrees
+gittree config set autoCopyDotEnv false
+gittree config unset autoCopyDotEnv
+
+# Generate shell completion script (bash/zsh/fish)
+gittree completion zsh > /usr/local/share/zsh/site-functions/_gittree
 ```
 
 ### Important Notes
@@ -65,13 +86,23 @@ gittree config completion zsh > /usr/local/share/zsh/site-functions/_gittree
 - **Setup hooks**: a `.gittree.json` in the repository root auto-runs `copy`, `symlink` and
   `script` entries after every `worktree add` (override with `--no-setup`).
 - **Git version gate**: the CLI refuses to start if your Git is older than 2.24.
+- **Global config location**: reads from `$XDG_CONFIG_HOME/gittree/config.json` first,
+  then falls back to `~/.gittree/config.json`. Works on Linux, macOS and Windows
+  (env vars `HOME`, `HOMEDIR` or `HOMEPATH` are all recognised). CLI `completion` and
+  `config` commands are **repository-independent** — they work without a `.git` folder.
+- **Config type coercion**: `gittree config set key VALUE` automatically coerces scalar
+  values: `true`/`false` → booleans, `null` → null, pure digits → integers, floats
+  like `3.14` → floats, valid JSON objects/arrays → parsed. Anything else is stored
+  as a plain string.
+- **Bash 3.2 compatibility**: the generated bash completion script is compatible with
+  the default macOS bash (GNU Bash 3.2) — it avoids `;;&` fallthrough case syntax.
 
 ---
 
 ## Package Scripts
 
-| Script | Description |
-|---|---|
-| `npm -w @gittree/cli run build` | ESM build with `tsup` |
-| `npm -w @gittree/cli run dev` | Watch build |
+| Script                              | Description           |
+| ----------------------------------- | --------------------- |
+| `npm -w @gittree/cli run build`     | ESM build with `tsup` |
+| `npm -w @gittree/cli run dev`       | Watch build           |
 | `npm -w @gittree/cli run typecheck` | Strict `tsc --noEmit` |

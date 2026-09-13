@@ -31,7 +31,10 @@
     "paths": {
       "@gittree/core": ["packages/core/src/index.ts"],
       "@gittree/core/*": ["packages/core/src/*"],
-      "@gittree/core/testing": ["packages/core/src/testing/index.ts"]
+      "@gittree/core/testing": ["packages/core/src/testing/index.ts"],
+      "@codemastersolutions/gittree-core": ["packages/core/src/index.ts"],
+      "@codemastersolutions/gittree-core/*": ["packages/core/src/*"],
+      "@codemastersolutions/gittree-core/testing": ["packages/core/src/testing/index.ts"]
     }
   },
   "exclude": [

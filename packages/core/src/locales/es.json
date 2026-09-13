@@ -1,28 +1,30 @@
 {
   "errors": {
-    "gitVersionTooOld": "Se requiere Git v{required}; tienes v{actual}. Actualiza Git antes de usar GitTree.",
-    "gitExecFailed": "Comando Git '{command}' falló (exit {exitCode}).\n{stderr}",
-    "dirtyWorktree": "El worktree en '{path}' tiene cambios sin commitear ({count} archivos). Pasa --force o marca la casilla Forzar para descartarlos.",
-    "branchLocked": "La rama '{branch}' ya tiene checkout en '{path}'. Una rama solo puede estar activa en un worktree a la vez.",
-    "branchAhead": "La rama '{branch}' está adelantada a origin en {count} commits. Haz push primero, o pasa --skip-push-check para ignorar.",
-    "configParseError": "Fallo al parsear {source}: {detail}"
-  },
-  "worktree": {
-    "addSuccess": "Worktree creado en {path} en la rama {branch}",
-    "removeSuccess": "Worktree en {path} eliminado correctamente",
-    "pruneFound": "Prune eliminaría {count} referencias huérfanas",
-    "pruneDone": "{count} referencias huérfanas eliminadas vía prune"
+    "gitVersionTooOld": "Se requiere Git {required}; se encontró {actual}",
+    "gitExecutionFailed": "El comando Git falló: {command}",
+    "dirtyWorktree": "La worktree en {path} tiene {count} cambios sin commitear; usa --force para ignorar",
+    "branchLocked": "La rama '{branch}' ya está abierta en la worktree '{path}'",
+    "branchAhead": "La rama '{branch}' está {ahead} commits por delante de su upstream",
+    "configParseError": "No se pudo parsear {source}: {message}",
+    "worktreePathExists": "La ruta '{path}' ya existe; elige otro destino o elimina primero la carpeta",
+    "worktreeAddFailed": "No se pudo crear la worktree: {stderr}",
+    "worktreeAddMissingResult": "La creación de la worktree se ejecutó pero no hay entrada en '{path}'; usa `git worktree list` para inspeccionar",
+    "worktreeNotFound": "No se encontró worktree en '{path}'",
+    "worktreeRemoveFailed": "No se pudo eliminar la worktree: {stderr}",
+    "worktreePruneFailed": "No se pudo limpiar worktrees obsoletas: {stderr}",
+    "branchDeleteFailed": "No se pudo borrar la rama local '{branch}': {stderr}",
+    "remoteBranchDeleteFailed": "No se pudo borrar la rama remota '{remote}/{branch}': {stderr}",
+    "branchAheadBeforeRemove": "La rama '{branch}' está {ahead} commits por delante; haz push primero o usa --skip-push-check o --force"
   },
   "sync": {
-    "pullFf": "Pull fast-forward de {branch}",
-    "pullMerge": "Pull con merge de {branch}",
-    "pullRebase": "Pull con rebase de {branch}",
-    "conflict": "No se pudo hacer fast-forward en {branch}; haz merge o rebase manualmente",
-    "done": "Sincronizados {count}/{total} worktrees correctamente"
+    "conflict": "Conflicto de merge detectado al sincronizar con '{ref}' (estrategia {strategy}); resuélvelo manualmente"
   },
   "common": {
     "processing": "Procesando…",
     "done": "Hecho",
     "canceled": "Operación cancelada"
+  },
+  "cli": {
+    "commandNotImplemented": "El comando '{command}' aún no está implementado. Sigue el progreso en {url}"
   }
 }

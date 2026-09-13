@@ -1,8 +1,8 @@
 {
-  "name": "@gittree/vscode",
+  "name": "gittree-vscode",
   "displayName": "GitTree - Git Worktree Manager",
   "description": "VS Code extension for managing Git worktrees with graphical sidebar, wizards and safety guards.",
-  "version": "0.1.0",
+  "version": "0.6.0",
   "publisher": "GitTree",
   "license": "MIT",
   "private": true,
@@ -19,7 +19,6 @@
     "branch",
     "productivity"
   ],
-  "icon": "resources/icon.png",
   "galleryBanner": {
     "color": "#1f6feb",
     "theme": "dark"
@@ -347,10 +346,9 @@
     "package": "vsce package --out ../../dist/gittree-vscode.vsix",
     "test": "node ./out/test/runTest.js"
   },
-  "dependencies": {
-    "@gittree/core": "*"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@codemastersolutions/gittree-core": "workspace:*",
     "@types/node": "^22.5.4",
     "@types/vscode": "^1.80.0",
     "@vscode/test-electron": "^2.4.1",

@@ -1,8 +1,9 @@
 # GitTree
 
-> **Status**: Fase 1 — Bootstrap do Core Engine
+> **Status**: Fase 6 — WebView, Paridade CLI e Documentação (concluída)
 >
 > Monorepo multi-pacote contendo duas ferramentas de gerenciamento de Git worktrees:
+>
 > - **`@gittree/cli`** — Interface de linha de comando para terminal e CI/CD
 > - **`GitTree` (extensão VS Code)** — Sidebar gráfica e wizards para VS Code / VSCodium / Cursor / Gitpod
 >
@@ -106,22 +107,22 @@ GitTree/
 
 ## Scripts (root `package.json`)
 
-| Script | Descrição |
-|---|---|
-| `npm run build` | Build core → cli → vscode (ordem topológica correta) |
-| `npm run dev` | Watch-build dos 3 pacotes em paralelo |
-| `npm run typecheck` | `tsc --noEmit` em todos workspaces |
-| `npm run lint` | ESLint em `packages/*/src/**/*.ts` |
-| `npm run lint:fix` | Auto-correção ESLint |
-| `npm run format` | Auto-formatação Prettier |
-| `npm run format:check` | Dry-run Prettier (usado no CI) |
-| `npm run test` | Testes unitários (core + cli) |
-| `npm run test:watch` | Testes unitários modo watch |
-| `npm run test:coverage` | Testes unitários + relatório cobertura (>= 90%) |
-| `npm run test:integration` | Testes de integração (repositórios git reais) |
-| `npm run audit` | `npm audit --production` (porta de segurança) |
-| `npm run clean` | Remove todos `dist`, `node_modules` |
-| `npm run prepare` | Instala hooks Husky (roda automaticamente após `npm install`) |
+| Script                     | Descrição                                                     |
+| -------------------------- | ------------------------------------------------------------- |
+| `npm run build`            | Build core → cli → vscode (ordem topológica correta)          |
+| `npm run dev`              | Watch-build dos 3 pacotes em paralelo                         |
+| `npm run typecheck`        | `tsc --noEmit` em todos workspaces                            |
+| `npm run lint`             | ESLint em `packages/*/src/**/*.ts`                            |
+| `npm run lint:fix`         | Auto-correção ESLint                                          |
+| `npm run format`           | Auto-formatação Prettier                                      |
+| `npm run format:check`     | Dry-run Prettier (usado no CI)                                |
+| `npm run test`             | Testes unitários (core + cli)                                 |
+| `npm run test:watch`       | Testes unitários modo watch                                   |
+| `npm run test:coverage`    | Testes unitários + relatório cobertura (>= 90%)               |
+| `npm run test:integration` | Testes de integração (repositórios git reais)                 |
+| `npm run audit`            | `npm audit --production` (porta de segurança)                 |
+| `npm run clean`            | Remove todos `dist`, `node_modules`                           |
+| `npm run prepare`          | Instala hooks Husky (roda automaticamente após `npm install`) |
 
 ---
 
@@ -143,9 +144,14 @@ Scopes válidos: `core`, `cli`, `vscode`, `repo`, `ci`, `deps`, `docs`, `readme`
 
 Veja o plano faseado completo em **[docs/plano-gittree-cli-extensao-vscode.md](docs/plano-gittree-cli-extensao-vscode.md)**.
 
-Fase atual: **Fase 1 — Bootstrap & Core Engine**
-- ✅ Scaffold monorepo, toolchain, CI base, portas de qualidade, hooks husky
-- 🔧 Core engine: GitAdapter + tipos + parsers (Tarefa 2 · Tarefa 3)
+Fase atual: **Fase 6 — WebView, Paridade CLI e Preparação para Distribuição**
+
+- ✅ Scaffold monorepo, toolchain, CI base, portas de qualidade, hooks husky (Fase 1)
+- ✅ Core engine: GitAdapter + tipos + parsers + CommitLogEntry/logRecent (Fases 1-5)
+- ✅ CLI: 12 comandos + shell completion (bash/zsh/fish, compatível bash 3.2) + config global XDG + 3 READMEs (Fases 2-6 · T16)
+- ✅ Extensão VS Code: TreeView lateral (hierarquia 3 níveis, cache TTL 2s) + 10 comandos de navegação + Wizard Nova Worktree + Ações em Lote (SyncAll/Prune/Push/Pull/SetupScripts) + WebView Detalhes da Worktree (4 seções, postMessage bidirecional, CSP strict, tokens de tema VS Code) + 3 READMEs (Fases 4-6 · T15)
+- ✅ Docs: 12 arquivos README trilíngues (root / core / cli / vscode × en / pt-br / es) atualizados com features da Fase 6 (T16.5)
+- ✅ Gates: 140/140 testes unitários PASS · cobertura v8 Stmts 92.66% / Funcs 97.26% / Lines 92.66% (≥90%) · tsc strict 0 erros · ESLint 0 erros · `npm audit --production` 0 vulnerabilidades · builds core+cli+vscode OK
 
 ---
 

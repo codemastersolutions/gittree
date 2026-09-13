@@ -17,6 +17,20 @@ npm install -g @gittree/cli
 gittree --version
 ```
 
+#### Habilitar Autocompletar en Shell (opcional)
+
+```bash
+# bash → añade esta línea en ~/.bashrc o ~/.bash_profile
+source <(gittree completion bash)
+
+# zsh → guarda en cualquier directorio de tu $fpath (recomendado)
+gittree completion zsh > /usr/local/share/zsh/site-functions/_gittree
+# después: autoload -Uz compinit && compinit
+
+# fish → guarda en el directorio estándar de completions de fish
+gittree completion fish > ~/.config/fish/completions/gittree.fish
+```
+
 ### Opciones Globales
 
 ```
@@ -49,8 +63,15 @@ gittree worktree sync --all --strategy ff-only
 # Health check de todo el repositorio
 gittree repo doctor
 
-# Genera script autocomplete para tu shell
-gittree config completion zsh > /usr/local/share/zsh/site-functions/_gittree
+# Config global: lista, obtén, define y elimina claves entre repositorios
+gittree config list
+gittree config get defaultWorktreeBaseDir
+gittree config set defaultWorktreeBaseDir ~/git-worktrees
+gittree config set autoCopyDotEnv false
+gittree config unset autoCopyDotEnv
+
+# Genera script de autocompletar shell (bash/zsh/fish)
+gittree completion zsh > /usr/local/share/zsh/site-functions/_gittree
 ```
 
 ### Notas Importantes
@@ -66,13 +87,23 @@ gittree config completion zsh > /usr/local/share/zsh/site-functions/_gittree
 - **Setup hooks**: un `.gittree.json` en la raíz del repositorio ejecuta automáticamente
   las entradas `copy`, `symlink` y `script` después de cada `worktree add` (anular con `--no-setup`).
 - **Puerta de versión Git**: el CLI se niega a arrancar si tu Git es anterior a 2.24.
+- **Ubicación config global**: lee primero de `$XDG_CONFIG_HOME/gittree/config.json`,
+  después cae en `~/.gittree/config.json`. Funciona en Linux, macOS y Windows
+  (todas las variables `HOME`, `HOMEDIR` o `HOMEPATH` son reconocidas). Los comandos
+  `completion` y `config` son **independientes de repositorio** — funcionan sin carpeta `.git`.
+- **Coerción de tipos en config**: `gittree config set clave VALOR` infiere automáticamente
+  escalares: `true`/`false` → booleanos, `null` → nulo, dígitos puros → enteros,
+  floats tipo `3.14` → decimales, objetos/arrays JSON válidos son parseados. Cualquier
+  otro valor se guarda como string simple.
+- **Compatibilidad Bash 3.2**: el script generado para bash es compatible con el bash por
+  defecto de macOS (GNU Bash 3.2) — evita sintaxis `;;&` de fallthrough en el case.
 
 ---
 
 ## Scripts del Paquete
 
-| Script | Descripción |
-|---|---|
-| `npm -w @gittree/cli run build` | Build ESM con `tsup` |
-| `npm -w @gittree/cli run dev` | Build en modo watch |
+| Script                              | Descripción           |
+| ----------------------------------- | --------------------- |
+| `npm -w @gittree/cli run build`     | Build ESM con `tsup`  |
+| `npm -w @gittree/cli run dev`       | Build en modo watch   |
 | `npm -w @gittree/cli run typecheck` | `tsc --noEmit` strict |

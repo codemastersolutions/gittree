@@ -29,20 +29,30 @@
    - ⊕ **New Worktree** — abre wizard de 4 passos
    - ↓ **Sync All** — fast-forward pull em todas worktrees
    - 🗑 **Prune (dry-run)** — limpa referências órfãs
+5. **View Detalhes da Worktree** — clique com botão direito em qualquer worktree e escolha
+   **Worktree Details**, ou execute `GitTree: Worktree Details` na command palette.
+   Um painel WebView abre com 4 seções:
+   - **Worktree Info** — caminho, branch, hash HEAD, flag de worktree principal
+   - **State** — pill colorido de status (clean / dirty / ahead / behind / diverged / detached),
+     branch upstream, contadores ahead/behind, flag detached
+   - **Modified files** — tabela com path + status (Modified / Untracked / Deleted)
+   - **Recent commits** — últimos 10 commits desta worktree com hash, subject, autor, data
+   - 3 botões de ação no canto superior direito: **Terminal** (abre shell na raiz da worktree),
+     **Abrir Pasta** (abre worktree em nova janela do VS Code), **Atualizar** (recarrega estado).
 
 ### Atalhos de Teclado (todos prefixados por `Ctrl+Alt+G` / `⌘⌥G` no macOS)
 
-| Atalho | Comando |
-|---|---|
-| `R` | Atualizar worktrees |
-| `N` | Wizard nova worktree |
-| `O` | Abrir worktree em nova janela |
-| `T` | Abrir terminal na raiz da worktree |
-| `P` | Pull worktree (ff-only) |
-| `U` | Push worktree |
-| `S` | Sincronizar todas worktrees |
-| `X` | Remover worktree (com diálogo de segurança) |
-| `H` | Exibir painel de saúde do repositório |
+| Atalho | Comando                                     |
+| ------ | ------------------------------------------- |
+| `R`    | Atualizar worktrees                         |
+| `N`    | Wizard nova worktree                        |
+| `O`    | Abrir worktree em nova janela               |
+| `T`    | Abrir terminal na raiz da worktree          |
+| `P`    | Pull worktree (ff-only)                     |
+| `U`    | Push worktree                               |
+| `S`    | Sincronizar todas worktrees                 |
+| `X`    | Remover worktree (com diálogo de segurança) |
+| `H`    | Exibir painel de saúde do repositório       |
 
 ### Exemplos
 
@@ -73,6 +83,20 @@ Cenário: limpar worktree mergeada COM SEGURANÇA.
  5. Branch + pasta da worktree são removidos; painel de status atualiza automaticamente.
 ```
 
+```
+Cenário: inspecionar worktree antes de decidir deletar ou mergear.
+
+ 1. Clique direito worktree "feature/auth" na sidebar → Worktree Details
+ 2. WebView abre → mostra:
+     • Pill: 🔴 dirty (3 arquivos modified / 2 untracked)
+     • Seção "Modified files" lista src/auth.ts (Modified) + .env.local (Untracked)
+     • Seção "Recent commits" mostra último push feito há 3 dias
+ 3. Clique "Terminal" para abrir shell na worktree e revisar mudanças
+ 4. Após `git add && git commit`, clique "Atualizar" no painel de detalhes
+    → pill vira 🟢 clean e tabela modified exibe "Sem arquivos modificados."
+ 5. Clique direito na worktree → Remover… — diálogo agora passa nos checks de segurança.
+```
+
 ### Notas Importantes
 
 - **Guards de segurança espelham o core engine**: VOCÊ NÃO PODE deletar uma worktree suja a
@@ -90,6 +114,10 @@ Cenário: limpar worktree mergeada COM SEGURANÇA.
 - **Setup scripts do `.gittree.json` rodam automaticamente** após o wizard "Nova Worktree",
   portanto qualquer cópia de `.env` ou symlink declarado no repositório é aplicado ANTES da
   nova janela abrir.
+- **Tema WebView Detalhes da Worktree**: toda cor CSS usa variáveis `var(--vscode-*)`
+  (foreground, borda de painel, fundos de botão, cores ANSI do terminal para pills), então o
+  painel segue exatamente seu tema claro/escuro/alto-contraste atual. A comunicação
+  `postMessage` bidirecional segue o CSP strict do VS Code (sem `unsafe-inline`/CDN).
 
 ---
 
@@ -98,23 +126,23 @@ Cenário: limpar worktree mergeada COM SEGURANÇA.
 Lista completa em `package.json → contributes.configuration`. Abra as configurações do VS Code
 (`Ctrl+,`) e pesquise por **GitTree** para editar interativamente.
 
-| Chave | Padrão | Descrição |
-|---|---|---|
-| `gittree.defaultWorktreeBaseDir` | `".."` | Pasta base onde novas worktrees são criadas (fora do repo por padrão) |
-| `gittree.defaultSyncStrategy` | `"ff-only"` | Estratégia padrão de pull: `ff-only` / `merge` / `rebase` |
-| `gittree.autoCopyDotEnv` | `true` | Auto-cópia de `.env` quando `.gittree.json` não tem setup explícito |
-| `gittree.confirmRemoval` | `true` | Sempre mostrar diálogo antes de remover worktree |
-| `gittree.telemetry.enabled` | `false` | Telemetria anônima, desligada por padrão |
-| `gittree.language` | `"default"` | Idioma UI: `default` segue VS Code |
+| Chave                            | Padrão      | Descrição                                                             |
+| -------------------------------- | ----------- | --------------------------------------------------------------------- |
+| `gittree.defaultWorktreeBaseDir` | `".."`      | Pasta base onde novas worktrees são criadas (fora do repo por padrão) |
+| `gittree.defaultSyncStrategy`    | `"ff-only"` | Estratégia padrão de pull: `ff-only` / `merge` / `rebase`             |
+| `gittree.autoCopyDotEnv`         | `true`      | Auto-cópia de `.env` quando `.gittree.json` não tem setup explícito   |
+| `gittree.confirmRemoval`         | `true`      | Sempre mostrar diálogo antes de remover worktree                      |
+| `gittree.telemetry.enabled`      | `false`     | Telemetria anônima, desligada por padrão                              |
+| `gittree.language`               | `"default"` | Idioma UI: `default` segue VS Code                                    |
 
 ---
 
 ## Scripts do Pacote
 
-| Script | Descrição |
-|---|---|
-| `npm -w @gittree/vscode run build` | Bundle com esbuild → `dist/extension.js` (CJS) |
-| `npm -w @gittree/vscode run dev` | Bundle em modo watch |
-| `npm -w @gittree/vscode run typecheck` | `tsc --noEmit` strict |
-| `npm -w @gittree/vscode run package` | Produz `.vsix` instalável via `vsce` |
-| `npm -w @gittree/vscode run test` | Executa tests da extensão via `@vscode/test-electron` |
+| Script                                 | Descrição                                             |
+| -------------------------------------- | ----------------------------------------------------- |
+| `npm -w @gittree/vscode run build`     | Bundle com esbuild → `dist/extension.js` (CJS)        |
+| `npm -w @gittree/vscode run dev`       | Bundle em modo watch                                  |
+| `npm -w @gittree/vscode run typecheck` | `tsc --noEmit` strict                                 |
+| `npm -w @gittree/vscode run package`   | Produz `.vsix` instalável via `vsce`                  |
+| `npm -w @gittree/vscode run test`      | Executa tests da extensão via `@vscode/test-electron` |

@@ -19,48 +19,60 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js (with pnpm via corepack)
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-          cache: 'npm'
+          cache: 'pnpm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Enable corepack and align pnpm version
+        run: |
+          corepack enable
+          corepack install --global pnpm@$(node -e "console.log(require('./package.json').packageManager.split('@')[1])")
+          pnpm --version
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: TypeScript typecheck
-        run: npm run typecheck
+        run: pnpm typecheck
 
       - name: Lint (ESLint)
-        run: npm run lint
+        run: pnpm lint
 
       - name: Format check (Prettier)
-        run: npm run format:check
+        run: pnpm format:check
 
       - name: Commitlint (PR title)
         if: github.event_name == 'pull_request'
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
-        run: echo "$PR_TITLE" | npx commitlint || { echo "::warning::PR title does not follow conventional commits"; true; }
+        run: pnpm dlx @codemastersolutions/commitzero lint -m "$PR_TITLE" || { echo "::warning::PR title does not follow conventional commits"; true; }
 
   test-core-cli:
-    name: Unit Tests (core + cli)
+    name: Unit Tests (core + cli + vscode)
     runs-on: ubuntu-latest
     needs: quality
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js (with pnpm via corepack)
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-          cache: 'npm'
+          cache: 'pnpm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Enable corepack and align pnpm version
+        run: |
+          corepack enable
+          corepack install --global pnpm@$(node -e "console.log(require('./package.json').packageManager.split('@')[1])")
+          pnpm --version
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Run unit tests with coverage
-        run: npm run test:coverage
+        run: pnpm test:coverage
 
       - name: Upload coverage artifacts
         if: always()
@@ -102,14 +114,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js ${{ matrix.node-version }} (with pnpm via corepack)
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: 'pnpm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Enable corepack and align pnpm version
+        run: |
+          corepack enable
+          corepack install --global pnpm@$(node -e "console.log(require('./package.json').packageManager.split('@')[1])")
+          pnpm --version
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Ensure git config
         run: |
@@ -118,7 +136,7 @@ jobs:
           git config --global init.defaultBranch main
 
       - name: Run integration tests
-        run: npm run test:integration
+        run: pnpm test:integration
 
   build:
     name: Build & Package
@@ -127,17 +145,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js (with pnpm via corepack)
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-          cache: 'npm'
+          cache: 'pnpm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Enable corepack and align pnpm version
+        run: |
+          corepack enable
+          corepack install --global pnpm@$(node -e "console.log(require('./package.json').packageManager.split('@')[1])")
+          pnpm --version
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Build all packages
-        run: npm run build
+        run: pnpm build
 
       - name: Upload CLI build artifact
         uses: actions/upload-artifact@v4
@@ -156,7 +180,7 @@ jobs:
       - name: Package VS Code extension
         run: |
           cd packages/vscode
-          npx vsce package --no-git-tag-version --out ../../dist/gittree.vsix || echo "vsce package skipped (may require marketplace credentials for non-release)"
+          pnpm dlx @vscode/vsce package --no-git-tag-version --out ../../dist/gittree.vsix --no-yarn --allow-missing-repository || echo "vsce package skipped (may require marketplace credentials for non-release)"
 
       - name: Upload VSIX artifact (if available)
         if: hashFiles('dist/gittree.vsix') != ''
@@ -173,18 +197,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js (with pnpm via corepack)
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-          cache: 'npm'
+          cache: 'pnpm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Enable corepack and align pnpm version
+        run: |
+          corepack enable
+          corepack install --global pnpm@$(node -e "console.log(require('./package.json').packageManager.split('@')[1])")
+          pnpm --version
 
-      - name: npm audit (production)
-        run: npm audit --production --audit-level=high || {
-          echo "::warning::npm audit found issues";
-          npm audit --production;
-          exit 1;
-        }
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: pnpm audit (production)
+        run: |
+          pnpm audit --prod --audit-level high || {
+            echo "::warning::pnpm audit found issues";
+            pnpm audit --prod;
+            exit 1;
+          }

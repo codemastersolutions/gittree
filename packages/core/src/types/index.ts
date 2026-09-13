@@ -25,9 +25,48 @@ export interface Worktree {
 
 export type SyncStrategy = 'ff-only' | 'merge' | 'rebase';
 
+export interface GitTreeSetupConfig {
+  readonly setup?: {
+    readonly copy?: readonly string[];
+    readonly symlink?: readonly string[];
+  };
+}
+
+export type AddWorktreeKind = 'new-branch' | 'existing-branch' | 'remote-branch';
+
+export interface WorktreeAddResult {
+  readonly worktree: Worktree;
+  readonly kind: AddWorktreeKind;
+  readonly branchName: string | undefined;
+  readonly newBranchCreated: boolean;
+  readonly setup?: {
+    readonly copied?: readonly string[];
+    readonly symlinked?: readonly string[];
+    readonly warnings?: readonly string[];
+  };
+}
+
+export interface PruneResult extends OperationResult {
+  readonly prunedPaths: readonly string[];
+}
+
+export interface DeleteBranchResult extends OperationResult {
+  readonly deleted: boolean;
+  readonly branchName: string;
+  readonly remote?: string;
+}
+
+export interface WorktreeRemoveResult extends OperationResult {
+  readonly removedPath: string;
+  readonly branchDeleted?: { readonly local?: boolean; readonly remote?: boolean };
+  readonly skippedPushCheck: boolean;
+  readonly force: boolean;
+}
+
 export interface Branch {
   readonly name: string;
   readonly remote: string | undefined;
+  readonly upstream: string | undefined;
   readonly isCurrent: boolean;
   readonly isRemote: boolean;
   readonly upToDate: boolean | undefined;

@@ -1,0 +1,15 @@
+# Exclude sibling packages (core, cli) and files at packages/ level
+../core
+../cli
+
+# Exclude all root monorepo files (2 levels up from packages/vscode)
+../../*
+# Re-allow nothing from root - everything needed is under packages/vscode
+
+# Now exclude things inside packages/vscode itself that we don't want
+node_modules
+src
+.vscodeignore
+*.test.ts
+esbuild.mjs
+tsconfig.json
