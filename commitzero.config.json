@@ -17,7 +17,7 @@
   "maxSubjectLength": 72,
   "allowBreaking": true,
   "footerKeywords": ["BREAKING CHANGE", "Closes", "Refs"],
-  "preCommitCommands": ["pnpm run lint:staged"],
+  "preCommitCommands": ["pnpm run lint:staged", "pnpm run test"],
   "preCommitTimeout": "3m",
   "language": "pt",
   "uiAltScreen": true,
