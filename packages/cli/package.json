@@ -19,7 +19,7 @@
     "url": "https://github.com/codemastersolutions/gittree/issues"
   },
   "homepage": "https://github.com/codemastersolutions/gittree/tree/develop/packages/cli#readme",
-  "author": "CodeMaster Solutionções <gilson@codemastersolutions.com>",
+  "author": "CodeMaster Soluções <gilson@codemastersolutions.com>",
   "funding": [
     {
       "type": "github",
@@ -36,10 +36,15 @@
     "monorepo",
     "sync",
     "developer-tools",
-    "gittree"
+    "gittree",
+    "gtree",
+    "codemaster",
+    "soluções",
+    "solutions"
   ],
   "bin": {
-    "gittree": "./bin/gittree.js"
+    "gittree": "./bin/gittree.js",
+    "gtree": "./bin/gittree.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
