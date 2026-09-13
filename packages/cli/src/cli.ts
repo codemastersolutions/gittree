@@ -4,33 +4,27 @@ import { dirname, join, relative } from 'node:path';
 
 import pkg from '../package.json' with { type: 'json' };
 import {
-  createGitTree,
-  type GitAdapter,
-  type GitTree,
-  type GitLocale,
-  I18n,
-} from '@codemastersolutions/gittree-core';
-import {
   BranchAheadError,
   BranchLockedError,
   ConfigParseError,
+  countByResult,
+  createGitTree,
   DirtyWorktreeError,
   GitExecutionError,
   GitTreeError,
   GitVersionError,
-} from '@codemastersolutions/gittree-core';
-import {
-  countByResult,
-  type RepoStatusReport,
-  type SyncResult,
-  type SyncStrategy,
-  type WorktreeStateKind,
-} from '@codemastersolutions/gittree-core';
-import {
+  I18n,
   safeExistsAnywhere,
   safeMkdirAnywhere,
   safeReadFileAnywhere,
   safeWriteFileAnywhere,
+  type GitAdapter,
+  type GitLocale,
+  type GitTree,
+  type RepoStatusReport,
+  type SyncResult,
+  type SyncStrategy,
+  type WorktreeStateKind,
 } from '@codemastersolutions/gittree-core';
 
 import { Logger, type LoggerOptions } from './logger.js';
@@ -322,13 +316,12 @@ function printHelpFor(logger: Logger, parts: readonly string[]): void {
   }
 }
 
-type TableCell = string;
-type TableRow = readonly TableCell[];
+type TableRow = readonly string[];
 
 function asciiTable(headers: TableRow, rows: readonly TableRow[]): string {
   const cols = headers.length;
   const widths = new Array<number>(cols).fill(0);
-  const measure = (cells: readonly TableCell[]) => {
+  const measure = (cells: readonly string[]) => {
     for (let i = 0; i < cols; i++) widths[i] = Math.max(widths[i]!, stripAnsi(cells[i]!).length);
   };
   measure(headers);
@@ -341,8 +334,7 @@ function asciiTable(headers: TableRow, rows: readonly TableRow[]): string {
   const sep = '  ';
   const lines: string[] = [];
   const headRow = headers.map((h, i) => pad(h, widths[i]!)).join(sep);
-  lines.push(headRow);
-  lines.push(widths.map((w) => '-'.repeat(Math.max(0, w))).join(sep));
+  lines.push(headRow, widths.map((w) => '-'.repeat(Math.max(0, w))).join(sep));
   for (const r of rows) {
     lines.push(r.map((c, i) => pad(c, widths[i]!)).join(sep));
   }
@@ -442,8 +434,7 @@ async function cmdWorktreeList(
     const blocks: string[] = [];
     for (const w of rows) {
       const lines: string[] = [];
-      lines.push(`worktree ${w.path}`);
-      lines.push(`HEAD ${w.head}`);
+      lines.push(`worktree ${w.path}`, `HEAD ${w.head}`);
       if (w.branch) lines.push(`branch ${w.branch}`);
       if (w.isDetached) lines.push('detached');
       if (w.isBare) lines.push('bare');
@@ -1010,7 +1001,7 @@ async function cmdConfigList(
 ): Promise<number> {
   const p = globalConfigPath(env);
   const cfg = await loadGlobalConfig(p);
-  const keys = Object.keys(cfg).sort();
+  const keys = Object.keys(cfg).sort((a, b) => a.localeCompare(b));
   if (keys.length === 0) {
     logger.info(`(no keys configured — file: ${p})`);
     return 0;

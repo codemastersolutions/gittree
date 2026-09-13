@@ -1,11 +1,6 @@
 import type { GitAdapter } from '../adapters/types.js';
 import type { WorktreeService } from './worktree-service.js';
-import type {
-  RepoStatusReport,
-  Worktree,
-  WorktreeState,
-  WorktreeStateKind,
-} from '../types/index.js';
+import type { RepoStatusReport, WorktreeState, WorktreeStateKind } from '../types/index.js';
 
 export interface CommitLogEntry {
   readonly hashShort: string;
@@ -133,4 +128,4 @@ function parseCommitLog(stdout: string): readonly CommitLogEntry[] {
   return entries;
 }
 
-export type { Worktree };
+export { type Worktree } from '../types/index.js';

@@ -55,7 +55,6 @@ export function parseWorktreePorcelain(
       if (line.startsWith('locked')) {
         const rest = line.slice('locked'.length).trim();
         lockReason = rest.length > 0 ? rest : undefined;
-        continue;
       }
     }
 

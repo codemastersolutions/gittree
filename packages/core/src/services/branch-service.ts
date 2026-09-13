@@ -133,6 +133,6 @@ export class BranchService {
 
 function quoteArg(arg: string): string {
   if (/^[a-zA-Z0-9@/+_:.-]+$/.test(arg)) return arg;
-  const escaped = arg.replace(/'/g, "'\\''");
+  const escaped = arg.replaceAll("'", String.raw`'\''`);
   return `'${escaped}'`;
 }

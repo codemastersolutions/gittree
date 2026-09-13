@@ -1,6 +1,5 @@
-import type { GitLocale } from './adapters/types.js';
+import type { GitAdapter, GitLocale } from './adapters/types.js';
 import { RealGitAdapter } from './adapters/real-git-adapter.js';
-import type { GitAdapter } from './adapters/types.js';
 import { I18n } from './i18n/index.js';
 import { WorktreeService } from './services/worktree-service.js';
 import { BranchService } from './services/branch-service.js';

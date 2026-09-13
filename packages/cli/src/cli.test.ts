@@ -8,7 +8,7 @@ import { execSync } from 'node:child_process';
 import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import { Writable } from 'node:stream';
 
-import type { MockGitAdapter } from '@codemastersolutions/gittree-core/testing';
+import { MockGitAdapter } from '@codemastersolutions/gittree-core/testing';
 import { run, GITTREE_CLI_VERSION } from './index.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -74,12 +74,7 @@ const AHEAD_STATUS_V2 = `# branch.oid aabbccddeeff00112233445566778899aabbccdd
 `;
 
 function makeAdapter(): MockGitAdapter {
-  // Lazy load to avoid importing from dist
-
-  const { MockGitAdapter: M } = require('@codemastersolutions/gittree-core/testing') as {
-    MockGitAdapter: typeof import('@codemastersolutions/gittree-core/testing').MockGitAdapter;
-  };
-  return new M({ cwd: ROOT, locale: 'en' });
+  return new MockGitAdapter({ cwd: ROOT, locale: 'en' });
 }
 
 describe('CLI bootstrap (Fase 3 Task 7)', () => {
@@ -235,7 +230,7 @@ describe('CLI worktree list/add/remove/prune (Fase 3 Task 8)', () => {
       isMain: boolean;
     }>;
     expect(Array.isArray(parsed)).toBe(true);
-    expect(parsed.length).toBe(2);
+    expect(parsed).toHaveLength(2);
     const main = parsed.find((w) => w.path === ROOT)!;
     expect(main.isMain).toBe(true);
     expect(main.branch).toBe('refs/heads/main');
@@ -585,7 +580,7 @@ describe('CLI worktree sync / branch / repo (Fase 3 Task 9)', () => {
       totalDirty: number;
       totalAheadBy: number;
     };
-    expect(parsed.worktrees.length).toBe(2);
+    expect(parsed.worktrees).toHaveLength(2);
     expect(typeof parsed.states).toBe('object');
     expect(parsed.states[ROOT]?.kind).toBeDefined();
     expect(parsed.states[FEAT]?.kind).toBe('dirty');

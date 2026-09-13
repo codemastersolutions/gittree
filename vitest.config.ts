@@ -34,13 +34,16 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@gittree/core': path.resolve(__dirname, 'packages/core/src/index.ts'),
+      // ⚠️ ORDEM IMPORTA: Vite procura aliases na ordem das keys; sempre
+      // declare subpaths (/testing) ANTES de seus módulos pai para evitar
+      // prefix-match acidental no módulo pai.
       '@gittree/core/testing': path.resolve(__dirname, 'packages/core/src/testing/index.ts'),
-      '@codemastersolutions/gittree-core': path.resolve(__dirname, 'packages/core/src/index.ts'),
       '@codemastersolutions/gittree-core/testing': path.resolve(
         __dirname,
         'packages/core/src/testing/index.ts',
       ),
+      '@gittree/core': path.resolve(__dirname, 'packages/core/src/index.ts'),
+      '@codemastersolutions/gittree-core': path.resolve(__dirname, 'packages/core/src/index.ts'),
     },
   },
 });

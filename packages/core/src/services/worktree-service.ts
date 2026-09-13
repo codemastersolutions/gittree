@@ -330,7 +330,7 @@ function realpathLikeEqual(a: string, b: string): boolean {
 
 function quote(s: string): string {
   if (/^[a-zA-Z0-9@/+_:.\-~]+$/.test(s)) return s;
-  const escaped = s.replace(/'/g, "'\\''");
+  const escaped = s.replaceAll("'", String.raw`'\''`);
   return `'${escaped}'`;
 }
 

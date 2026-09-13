@@ -1,7 +1,7 @@
 import type { GitAdapter } from '../adapters/types.js';
 import type { I18n } from '../i18n/index.js';
 import { GitExecutionError } from '../errors/index.js';
-import type { SyncOptions, SyncResult, SyncStrategy, Worktree } from '../types/index.js';
+import type { SyncOptions, SyncResult, SyncStrategy } from '../types/index.js';
 import { WorktreeService } from './worktree-service.js';
 
 export class SyncService {
@@ -167,11 +167,9 @@ export function countByResult(results: readonly SyncResult[]): {
   return { ok, conflicted, failed, skipped, total: results.length };
 }
 
-export type { Worktree };
-
 function quote(s: string): string {
   if (/^[a-zA-Z0-9@/+_:.-]+$/.test(s)) return s;
-  const escaped = s.replace(/'/g, "'\\''");
+  const escaped = s.replaceAll("'", String.raw`'\''`);
   return `'${escaped}'`;
 }
 
@@ -189,3 +187,5 @@ function isConflictedPull(
   }
   return /conflict/i.test(combined);
 }
+
+export { type Worktree } from '../types/index.js';

@@ -27,7 +27,7 @@
   "scripts": {
     "build": "pnpm --filter @codemastersolutions/gittree-core run build && pnpm --filter @codemastersolutions/gittree-cli run build && pnpm --filter gittree-vscode run build",
     "dev": "taskly --names core,cli,vscode --prefix name --prefix-colors blue,green,magenta \"pnpm --filter @codemastersolutions/gittree-core run dev\" \"pnpm --filter @codemastersolutions/gittree-cli run dev\" \"pnpm --filter gittree-vscode run dev\"",
-    "typecheck": "tsc --noEmit -p tsconfig.base.json",
+    "typecheck": "tsc --noEmit -p tsconfig.build.json",
     "lint": "eslint \"packages/*/src/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"packages/*/src/**/*.{ts,tsx}\" --fix",
     "format": "prettier --write \"packages/*/src/**/*.{ts,tsx,json,md}\"",

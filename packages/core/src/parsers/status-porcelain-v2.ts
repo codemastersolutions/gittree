@@ -45,7 +45,7 @@ export function parseStatusPorcelainV2(raw: string): WorktreeState {
     if (line.startsWith('1 ') || line.startsWith('2 ') || line.startsWith('u ')) {
       const cols = line.split(' ');
       const xy = cols[1];
-      const path = cols[cols.length - 1];
+      const path = cols.at(-1);
       const submoduleMarker = cols[2] ?? '';
       const hasIndexDelete = submoduleMarker.includes('S') ? false : false;
       void hasIndexDelete;
@@ -68,7 +68,6 @@ export function parseStatusPorcelainV2(raw: string): WorktreeState {
     if (line.startsWith('? ')) {
       const p = line.slice(2);
       if (p) untracked.push(p);
-      continue;
     }
   }
 
@@ -112,7 +111,7 @@ function splitOnce(input: string, sep: string): [string, string] {
 }
 
 function parseAb(raw: string): { ahead: number; behind: number } {
-  const match = raw.match(/\+(\d+)\s+-(\d+)/);
+  const match = new RegExp(/\+(\d+)\s+-(\d+)/).exec(raw);
   if (match) {
     return { ahead: Number(match[1] ?? 0), behind: Number(match[2] ?? 0) };
   }

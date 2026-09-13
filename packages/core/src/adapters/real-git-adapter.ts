@@ -12,7 +12,7 @@ function parseGitVersion(raw: string): GitVersion {
   // eslint-disable-next-line security/detect-unsafe-regex -- bounded length (below) + bounded quantifiers (max 3 / 5 digits).
   const versionRegex = /^git\s*version\s+(\d{1,3})\.(\d{1,3})(?:\.(\d{1,5}))?$/im;
   const head = raw.split('\n')[0] ?? ''.replace(/^\s+/, ' ').trim().slice(0, 120);
-  const match = head.match(versionRegex);
+  const match = new RegExp(versionRegex).exec(head);
   if (!match) {
     return {
       raw,
@@ -182,8 +182,8 @@ export class RealGitAdapter implements GitAdapter {
     let current = '';
     let inSingle = false;
     let inDouble = false;
-    for (let i = 0; i < trimmed.length; i++) {
-      const ch = trimmed[i] as string;
+    for (const element of trimmed) {
+      const ch = element as string;
       if (ch === "'" && !inDouble) {
         inSingle = !inSingle;
         continue;
