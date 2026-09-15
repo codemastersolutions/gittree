@@ -9,10 +9,15 @@ const MIN_GIT_MAJOR = 2;
 const MIN_GIT_MINOR = 24;
 
 function parseGitVersion(raw: string): GitVersion {
-  // eslint-disable-next-line security/detect-unsafe-regex -- bounded length (below) + bounded quantifiers (max 3 / 5 digits).
-  const versionRegex = /^git\s*version\s+(\d{1,3})\.(\d{1,3})(?:\.(\d{1,5}))?$/im;
-  const head = raw.split('\n')[0] ?? ''.replace(/^\s+/, ' ').trim().slice(0, 120);
-  const match = new RegExp(versionRegex).exec(head);
+  // Tolerate vendor suffixes: `git version 2.50.1 (Apple Git-155)`,
+  // `git version 2.42.0.windows.1`, etc. We only need the first three
+  // numeric groups and ignore anything that follows (spaces, parens,
+  // platform tags). The `$` anchor in the previous regex broke every
+  // such build, leaving the adapter pinned to 0.0.0.
+  // eslint-disable-next-line security/detect-unsafe-regex -- bounded quantifiers (max 3 / 5 digits) + no backtracking on the suffix.
+  const versionRegex = /git\s*version\s+(\d{1,3})\.(\d{1,3})(?:\.(\d{1,5}))?/i;
+  const head = raw.split('\n')[0] ?? '';
+  const match = versionRegex.exec(head);
   if (!match) {
     return {
       raw,
