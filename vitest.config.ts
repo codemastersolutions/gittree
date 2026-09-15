@@ -9,7 +9,7 @@ export default defineConfig({
     exclude: ['node_modules', 'dist', 'packages/vscode/src/webview/**'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov'],
+      reporter: ['text', 'json', 'json-summary', 'html', 'lcov'],
       include: ['packages/core/src/**/*.ts', 'packages/cli/src/**/*.ts'],
       exclude: [
         'packages/*/src/**/*.{test,spec}.ts',
@@ -23,9 +23,11 @@ export default defineConfig({
         'packages/cli/src/**',
       ],
       all: true,
+      reportsDirectory: './coverage',
       thresholds: {
         lines: 90,
         functions: 90,
+        branches: 80,
         statements: 90,
       },
     },

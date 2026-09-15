@@ -99,25 +99,11 @@ jobs:
           path: coverage/
           retention-days: 7
 
-      - name: Enforce 90% coverage
+      - name: Enforce 90% coverage (layer 2 — vitest thresholds fail fast on layer 1)
+        shell: bash
         run: |
-          node -e "
-            const c = require('./coverage/coverage-summary.json');
-            const total = c.total;
-            const checks = [
-              ['lines', total.lines.pct],
-              ['functions', total.functions.pct],
-              ['branches', total.branches.pct],
-              ['statements', total.statements.pct],
-            ];
-            let ok = true;
-            for (const [k, v] of checks) {
-              console.log(k + ': ' + v + '%');
-              if (Number(v) < 90) ok = false;
-            }
-            if (!ok) { console.error('Coverage below 90% threshold'); process.exit(1); }
-            console.log('Coverage OK');
-          "
+          set -euo pipefail
+          node scripts/check-coverage.mjs
 
   integration:
     name: Integration Tests

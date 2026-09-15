@@ -243,30 +243,13 @@ jobs:
           pnpm typecheck
           pnpm lint
 
-      - name: 5/8 · Unit tests + 90% coverage gate
+      - name: 5/8 · Unit tests + 90% coverage gate (layer1 vitest thresholds + layer2 script)
         if: steps.next-version.outputs.skip == 0
         shell: bash
         run: |
           set -euo pipefail
           pnpm test:coverage
-
-          node -e "
-            const c = require('./coverage/coverage-summary.json');
-            const t = c.total;
-            const checks = [
-              ['lines',      t.lines.pct],
-              ['functions',  t.functions.pct],
-              ['branches',   t.branches.pct],
-              ['statements', t.statements.pct],
-            ];
-            let ok = true;
-            for (const [k, v] of checks) {
-              console.log(k + ': ' + v + '%');
-              if (Number(v) < 90) ok = false;
-            }
-            if (!ok) { console.error('Coverage below 90% threshold'); process.exit(1); }
-            console.log('Coverage OK (>= 90%)');
-          "
+          node scripts/check-coverage.mjs
 
       - name: 6/8 · Publish @codemastersolutions/gittree-core · npm provenance
         if: steps.next-version.outputs.skip == 0
